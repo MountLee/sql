@@ -1,0 +1,90 @@
+potential problems in the data:
+	1. crimes outside Pittsburgh, original data have no zone or no neighborhood
+		- skipping crimes with any missing keys (for instance, no zones)
+		- skipping crimes with "ARREST" and offense types out of the given table
+		- already done: record skipped rows and write into log files
+	2. duplicated blotter IDs
+		- already done:
+		# insert ... on conflict ... do update ... returning ...
+		# write record into log files
+	3. mispelled neighborhood name.
+		- adjust_neighbor function
+			loop
+			substring, contain, levenshtein
+		- need improvement: raise notice when adjust neighborhood names and write into log files
+
+
+filter: 
+	row[i] == None
+
+setting input or output by command line driver
+
+catch the error:
+	psycopg2.IntegrityError
+
+find the best matched neigh_name:
+	minimum = cur.execute("SELECT min(levenshtein(lower(%s), lower(neighborhoods.hood)))",(row[6]))
+
+how to deal with patch data?
+	- many rows should be update rather than insert
+	- same problems with duplicated blotter IDs
+	# insert ... on conflict ... do update ... returning ...
+
+generate report:
+	what's the type of row in cursor?
+
+questions:
+
+# insert ... on conflict ... do update ... returning ...
+
+try
+statement
+except
+
+how to save the raised notice to log files?
+	">" option in command line?
+
+a.py >2 log | b.py
+
+
+create extensions? no such file or directory
+
+deal with probably abnormal data when ingesting: try?
+
+stderr and stdout flows: can they be splitted? (write the error message in filter_data rather than redirect it into ingest_data)
+
+how to graph the total number of crimes? (since we are asked to write the report as a text file)
+
+each week, last month, 
+
+CREATE OR REPLACE FUNCTION substring(neigh_name text)
+	RETURNS record AS
+	$$ SELECT * FROM topic
+		where forum_id = $1); $$
+LANGUAGE 'sql' VOLATILE;
+
+CREATE OR REPLACE FUNCTION adjust_neigh(neigh_name text)
+	RETURNS void AS
+	$$ UPDATE blotter
+		SET neighborhood = neigh_name,
+		WHERE neighborhood LIKE '%' || neigh_name || '%';
+	   UPDATE blotter
+		SET neighborhood = neigh_name,
+		WHERE neigh_name LIKE format('%%%s%%', neighborhood);
+	   UPDATE blotter
+		SET neighborhood = neigh_name,
+		WHERE levenshtein(neigh_name, neighborhood) < 3;
+	$$
+LANGUAGE 'sql' VOLATILE;
+
+conn.execute("""SELECT """)
+
+DO $$
+DECLARE
+neigh_name RECORD;
+BEGIN
+FOR neigh_name IN SELECT name FROM neighborhood LOOP
+	adjust_neigh(neigh_name)
+END LOOP;
+END;
+$$;

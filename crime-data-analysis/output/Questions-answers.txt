@@ -1,0 +1,19 @@
+1. Benefit:
+	- The coding work and debugging work are more manageable, because we split the work into several parts. Also, it becomes more convenient and safe to make some revisions in one of these parts. For example, if we want to change the list crime types of concerns, we only need to change filter_data.py.
+	- The structure of the whole system of scripts is clearer to read and use.
+	- It's more flexible to use since one can decide whether to generate a report or not. 
+	- It's easier to load multiple weeks fo data and generate new reports than a single large scripts, since one can first just ingest data without generating reports and then generate a report based on all the ingested data.
+
+2. Statistics
+	- the total number of crimes loaded into the database: 
+		1592
+	- the number of crimes skipped due to invalid data:
+		29
+		29 + 92 = 121 if including data with invalid neighborhood names
+	- the number of crimes whose data was automatically crrected:
+		25
+	(only count cases of mistyped neighborhood)
+	- the number of crimes whose record were patched:
+		10
+	- the number of crimes which were not patched because the patch data was invalid:
+		1
